@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tarefas</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #f4f4f4;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid #2563eb;
+        }
+
+        .carregando {
+            color: #666;
+            font-style: italic;
+        }
+
+        .erro {
+            color: #dc2626;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Minhas Tarefas</h1>
+    <div id="status-da-requisicao"></div>
+    <ul id="lista-de-tarefas"></ul>
+
+    <script>
+        const url = 'https://super-space-zebra-pjgxqgqqj7x436xrx-3333.app.github.dev/tarefas';
+        const listaDeTarefas = document.getElementById('lista-de-tarefas');
+        const statusDaRequisicao = document.getElementById('status-da-requisicao');
+
+        async function carregarTarefas() {
+            statusDaRequisicao.innerHTML = '<p class="carregando">Carregando tarefas...</p>';
+
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`Erro na requisição: ${response.status}`);
+                }
+
+                const tarefas = await response.json();
+                statusDaRequisicao.innerHTML = ''; // Limpa o status de carregamento
+
+                if (tarefas.length === 0) {
+                    listaDeTarefas.innerHTML = '<li>Nenhuma tarefa encontrada.</li>';
+                    return;
+                }
+
+                tarefas.forEach(tarefa => {
+                    const li = document.createElement('li');
+                    
+                    li.textContent = tarefa.titulo;
+                    listaDeTarefas.appendChild(li);
+                });
+
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+                statusDaRequisicao.innerHTML = `<p class="erro">Não foi possível carregar as tarefas. Verifique se o servidor está online.</p>`;
+            }
+        }
+
+        carregarTarefas();
+    </script>
+</body>
+
+</html>
